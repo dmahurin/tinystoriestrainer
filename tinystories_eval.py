@@ -1,9 +1,9 @@
-from transformers import GPTNeoForCausalLM, AutoTokenizer
+from transformers import LlamaForCausalLM, AutoTokenizer
 from settings import MAX_LENGTH
 
 TEMPERATURE = 0.8
 
-model = GPTNeoForCausalLM.from_pretrained("./results")
+model = LlamaForCausalLM.from_pretrained("./results")
 tokenizer = AutoTokenizer.from_pretrained("./results")
 tokenizer.pad_token = tokenizer.eos_token
 

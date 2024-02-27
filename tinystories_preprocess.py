@@ -1,6 +1,5 @@
 import argparse
 import os
-from transformers import GPTNeoConfig, GPTNeoForCausalLM, DataCollatorForLanguageModeling
 from datasets import Dataset, DatasetDict, Features, Value, Sequence
 from tqdm import tqdm
 from transformers import AutoTokenizer
