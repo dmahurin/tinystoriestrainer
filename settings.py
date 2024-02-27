@@ -1,6 +1,6 @@
 
-tokenizer = "mistralai/Mixtral-8x7B-v0.1"
-configuration = 'llama-1b'
+tokenizer = "BEE-spoke-data/smol_llama-101M-GQA"
+configuration = 'smol-llama-101m'
 END_OF_TEXT = '<|endoftext|>'
 MAX_LENGTH = 2048
 
