@@ -7,10 +7,12 @@ import json
 from tqdm import tqdm
 from transformers import AutoTokenizer
 import settings
+import configurations
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+import os
 
+logging.basicConfig(level=logging.DEBUG)
 
 pynvml.nvmlInit()
 
@@ -22,6 +24,7 @@ DEVICE = 'cuda'
 reuse_tokenizer = os.path.exists(settings.OUTPUT_DIR + '/' + 'tokenizer.model')
 tokenizer_path = settings.OUTPUT_DIR if reuse_tokenizer else settings.tokenizer
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+configuration = configurations.get_configuration(settings, tokenizer)
 tokenizer.pad_token = tokenizer.eos_token
 dataset_name = 'prepared_wikipedia_en'
 train_dataset_name = 'train'
@@ -53,283 +56,14 @@ def dataset_metrics(dataset):
 	if validation_dataset_name in dataset:
 		print(f"Size of validation dataset: {dataset[validation_dataset_name].num_rows} examples")
 
-
-# Initializing a LLaMA llama-7b style configuration
-configuration_7b = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 4096,
-	intermediate_size = 11008,
-	num_hidden_layers = 32,
-	num_attention_heads = 32,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_3b = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 2048,
-	intermediate_size = 11008,
-	num_hidden_layers = 32,
-	num_attention_heads = 32,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_1b = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 1536,
-	intermediate_size = 11008//2,
-	num_hidden_layers = 24,
-	num_attention_heads = 32,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_1500m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 1536,
-	intermediate_size = 11008,
-	num_hidden_layers = 24,
-	num_attention_heads = 32,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_300m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 480,
-	intermediate_size = 11008,
-	num_hidden_layers = 16,
-	num_attention_heads = 24,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_86m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 256,
-	intermediate_size = 11008,
-	num_hidden_layers = 8,
-	num_attention_heads = 8,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_51m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 256,
-	intermediate_size = 11008,
-	num_hidden_layers = 4,
-	num_attention_heads = 4,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_34m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 256,
-	intermediate_size = 11008//2,
-	num_hidden_layers = 4,
-	num_attention_heads = 4,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_25m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 256,
-	intermediate_size = 11008//4,
-	num_hidden_layers = 4,
-	num_attention_heads = 4,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_21m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 256,
-	intermediate_size = 11008//4,
-	num_hidden_layers = 2,
-	num_attention_heads = 2,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-
-configuration_19m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 256,
-	intermediate_size = 11008//8,
-	num_hidden_layers = 2,
-	num_attention_heads = 2,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration_9m = LlamaConfig(
-	vocab_size = tokenizer.vocab_size,
-	hidden_size = 128,
-	intermediate_size = 11008//8,
-	num_hidden_layers = 2,
-	num_attention_heads = 2,
-	num_key_value_heads = None,
-	hidden_act = 'silu',
-	max_position_embeddings = settings.MAX_LENGTH,
-	initializer_range = 0.02,
-	rms_norm_eps = 1e-06,
-	use_cache = True,
-	pad_token_id = None,
-	bos_token_id = 1,
-	eos_token_id = 2,
-	pretraining_tp = 1,
-	tie_word_embeddings = False,
-	rope_theta = 10000.0,
-	rope_scaling = None,
-	attention_bias = False
-)
-
-configuration = configuration_1b
-
-# Initializing a model from the llama-7b style configuration, or from pretrained if CHECKPOINT.
+# Initializing a model from the Llama configuration, or from pretrained if CHECKPOINT.
 checkpoint_directory = f'{results_directory}/{CHECKPOINT}' if CHECKPOINT is not None else None
 resume_from_checkpoint = checkpoint_directory if checkpoint_directory is not None else True if os.path.exists(results_directory) and any(s.startswith("checkpoint") for s in os.listdir(results_directory)) else False
 if CHECKPOINT:
 	print('loading checkpoint')
 	model = LlamaForCausalLM.from_pretrained(checkpoint_directory)
 else:
-	model = LlamaForCausalLM(configuration)
+	model = LlamaForCausalLM(LlamaConfig(**configuration))
     
 print(f"Number of parameters in model {model.num_parameters()}")
 print_gpu_utilization()
