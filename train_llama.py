@@ -14,13 +14,16 @@ import os
 
 logging.basicConfig(level=logging.DEBUG)
 
-pynvml.nvmlInit()
+if torch.cuda.is_available(): DEVICE = 'cuda'
+elif torch.backends.mps.is_available(): DEVICE = 'mps'
+else: DVICE = 'cpu'
 
+if torch.cuda.is_available(): pynvml.nvmlInit()
 
 CHECKPOINT = None # 'checkpoint-50000' # 'checkpoint-70000'
 OUTPUT_MODEL = settings.OUTPUT_DIR
 results_directory = settings.OUTPUT_DIR
-DEVICE = 'cuda'
+
 reuse_tokenizer = os.path.exists(settings.OUTPUT_DIR + '/' + 'tokenizer.model')
 tokenizer_path = settings.OUTPUT_DIR if reuse_tokenizer else settings.tokenizer
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
@@ -34,12 +37,14 @@ TRAINING_EPOCHS = 4
 
 
 def print_gpu_utilization():
+    if not torch.cuda.is_available(): return
     handle = pynvml.nvmlDeviceGetHandleByIndex(0)
     info = pynvml.nvmlDeviceGetMemoryInfo(handle)
     print(f"GPU memory occupied: {info.used//1024**2} MB.")
 
 
 def print_summary(result):
+    if not torch.cuda.is_available(): return
     print(f"Time: {result.metrics['train_runtime']:.2f}")
     print(f"Samples/second: {result.metrics['train_samples_per_second']:.2f}")
     print_gpu_utilization()
