@@ -10,9 +10,6 @@ reuse_tokenizer = os.path.exists(settings.OUTPUT_DIR + '/' + 'tokenizer.model')
 tokenizer_path = settings.OUTPUT_DIR if reuse_tokenizer else settings.tokenizer
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
-TRAIN_PATH = 'TinyStoriesV2-GPT4-train.txt'
-VALID_PATH = 'TinyStoriesV2-GPT4-valid.txt'
-
 # Define the features of your dataset
 """
 features = Features({
@@ -57,7 +54,7 @@ def main(padding_option):
     if padding_option != 'do_not_pad':
         tokenizer.pad_token = tokenizer.eos_token
 
-    data = load_data(TRAIN_PATH, VALID_PATH, padding_option)
+    data = load_data(settings.TRAIN_PATH, settings.VALID_PATH, padding_option)
     data.save_to_disk("prepared_tinystories2")
 
 
