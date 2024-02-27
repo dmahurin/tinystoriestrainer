@@ -1,13 +1,17 @@
 import argparse
+import os
 from transformers import GPTNeoConfig, GPTNeoForCausalLM, DataCollatorForLanguageModeling
 from datasets import Dataset, DatasetDict, Features, Value, Sequence
 from tqdm import tqdm
-from settings import END_OF_TEXT, MAX_LENGTH, tokenizer
+from transformers import AutoTokenizer
+import settings
 
+reuse_tokenizer = os.path.exists(settings.OUTPUT_DIR + '/' + 'tokenizer.model')
+tokenizer_path = settings.OUTPUT_DIR if reuse_tokenizer else settings.tokenizer
+tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
 TRAIN_PATH = 'TinyStoriesV2-GPT4-train.txt'
 VALID_PATH = 'TinyStoriesV2-GPT4-valid.txt'
-
 
 # Define the features of your dataset
 """
@@ -24,7 +28,7 @@ def load_stories(path: str):
         story = []
         for line in f:
             line = line.strip()
-            if line == END_OF_TEXT:
+            if line == settings.END_OF_TEXT:
                 yield '\n'.join(story)
                 story = []
             else:
@@ -37,14 +41,14 @@ def load_stories(path: str):
 def create_dataset(path: str, padding_option):
     stories = list(tqdm(load_stories(path), desc="Loading Stories"))
     dataset = Dataset.from_list([{'text': text} for text in stories])
-    dataset = dataset.map(lambda examples: tokenizer(examples['text'], truncation=True, padding=padding_option, max_length=MAX_LENGTH), batched=True, remove_columns=["text"], num_proc=8)
+    dataset = dataset.map(lambda examples: tokenizer(examples['text'], truncation=True, padding=padding_option, max_length=settings.MAX_LENGTH), batched=True, remove_columns=["text"], num_proc=8)
     # dataset.cast(features)
     return dataset
 
 
 def load_data(train_path, valid_path, padding_option):
     return DatasetDict({
-        'valid': create_dataset(valid_path, padding_option),
+        'test': create_dataset(valid_path, padding_option),
         'train': create_dataset(train_path, padding_option)
     })
 

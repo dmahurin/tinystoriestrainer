@@ -5,6 +5,7 @@ import torch
 import pynvml
 import json
 from tqdm import tqdm
+from transformers import AutoTokenizer
 import settings
 import logging
 
@@ -15,9 +16,12 @@ pynvml.nvmlInit()
 
 
 CHECKPOINT = None # 'checkpoint-50000' # 'checkpoint-70000'
-results_directory = 'results'
+OUTPUT_MODEL = settings.OUTPUT_DIR
+results_directory = settings.OUTPUT_DIR
 DEVICE = 'cuda'
-tokenizer = settings.tokenizer
+reuse_tokenizer = os.path.exists(settings.OUTPUT_DIR + '/' + 'tokenizer.model')
+tokenizer_path = settings.OUTPUT_DIR if reuse_tokenizer else settings.tokenizer
+tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 tokenizer.pad_token = tokenizer.eos_token
 dataset_name = 'prepared_wikipedia_en'
 train_dataset_name = 'train'
@@ -320,6 +324,7 @@ configuration = configuration_1b
 
 # Initializing a model from the llama-7b style configuration, or from pretrained if CHECKPOINT.
 checkpoint_directory = f'{results_directory}/{CHECKPOINT}' if CHECKPOINT is not None else None
+resume_from_checkpoint = checkpoint_directory if checkpoint_directory is not None else True if os.path.exists(results_directory) and any(s.startswith("checkpoint") for s in os.listdir(results_directory)) else False
 if CHECKPOINT:
 	print('loading checkpoint')
 	model = LlamaForCausalLM.from_pretrained(checkpoint_directory)
@@ -367,12 +372,12 @@ trainer = Trainer(
 
 results = None
 try:
-	results = trainer.train(resume_from_checkpoint=checkpoint_directory)
+	results = trainer.train(resume_from_checkpoint=resume_from_checkpoint)
 except:
 	raise
 finally:
 	model.save_pretrained(OUTPUT_MODEL)
-	tokenizer.save_pretrained(OUTPUT_MODEL)
+	if not reuse_tokenizer: tokenizer.save_pretrained(OUTPUT_MODEL)
 	if results:
 		with open(f'{OUTPUT_MODEL}/training_results.json', 'w') as result_file:
 		    json.dump(results, result_file)
