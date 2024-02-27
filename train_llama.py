@@ -75,6 +75,7 @@ dataset = load_from_disk(dataset_name)
 dataset_metrics(dataset)
 
 training_args = TrainingArguments(
+    report_to='none',
     output_dir=results_directory,
     overwrite_output_dir=True,
     num_train_epochs=TRAINING_EPOCHS,
@@ -87,6 +88,7 @@ training_args = TrainingArguments(
     evaluation_strategy='no',
     save_steps=1000,
     warmup_steps=500,
+    save_total_limit=2,
     learning_rate=START_LEARNING_RATE,
     fp16=True
 )
