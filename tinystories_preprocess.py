@@ -35,8 +35,7 @@ def load_stories(path: str):
             yield '\n'.join(story)
 
 
-def create_dataset(path: str, padding_option):
-    stories = list(tqdm(load_stories(path), desc="Loading Stories"))
+def create_dataset(stories: list, padding_option):
     dataset = Dataset.from_list([{'text': text} for text in stories])
     dataset = dataset.map(lambda examples: tokenizer(examples['text'], truncation=True, padding=padding_option, max_length=settings.MAX_LENGTH), batched=True, remove_columns=["text"], num_proc=8)
     # dataset.cast(features)
@@ -44,9 +43,16 @@ def create_dataset(path: str, padding_option):
 
 
 def load_data(train_path, valid_path, padding_option):
+    train = list(tqdm(load_stories(train_path), desc="Loading Training data"))
+    if valid_path is None:
+        valid_size = -(-len(train)//settings.VALIDATION_FRACTION)
+        valid = train[:valid_size]
+        train = train[valid_size:]
+    else:
+        valid = list(tqdm(load_stories(valid_path), desc="Loading Validation data"))
     return DatasetDict({
-        'test': create_dataset(valid_path, padding_option),
-        'train': create_dataset(train_path, padding_option)
+        'test': create_dataset(valid, padding_option),
+        'train': create_dataset(train, padding_option)
     })
 
 
