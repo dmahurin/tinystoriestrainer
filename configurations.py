@@ -1,3 +1,4 @@
+
 configurations = {
 	'default': {
 		'vocab_size': None, # default to tokenizer.vocab_size
@@ -50,6 +51,49 @@ configurations = {
 		'num_hidden_layers': 16,
 		'num_attention_heads': 24,
 	},
+	'llama2c-110m': {
+		'tie_word_embeddings': True,
+		'hidden_size': 768,
+		'intermediate_size': 2048,
+		'num_hidden_layers': 12,
+		'num_attention_heads': 12,
+		'num_key_value_heads': 12,
+		'max_position_embeddings': 1024,
+	},
+	'smol-llama-62m-tied': {
+		'tie_word_embeddings': True,
+		'hidden_size': 768,
+		'intermediate_size': 2048,
+		'num_hidden_layers': 6,
+		'num_attention_heads': 24,
+		'num_key_value_heads': 8,
+		'max_position_embeddings': 1024,
+	},
+	'smol-llama-81m-tied': {
+		'tie_word_embeddings': True,
+		'hidden_size': 768,
+		'intermediate_size': 3072,
+		'num_hidden_layers': 6,
+		'num_attention_heads': 24,
+		'num_key_value_heads': 24,
+		'max_position_embeddings': 1024,
+	},
+	'smol-llama-101m': {
+		'hidden_size': 768,
+		'intermediate_size': 3072,
+		'num_hidden_layers': 6,
+		'num_attention_heads': 24,
+		'num_key_value_heads': 8,
+		'max_position_embeddings': 1024,
+	},
+	'smol-llama-220m': {
+		'hidden_size': 1024,
+		'intermediate_size': 4096,
+		'num_hidden_layers': 10,
+		'num_attention_heads': 32,
+		'num_key_value_heads': 8,
+		'max_position_embeddings': 2048,
+	},
 	'llama-86m': {
 		'hidden_size': 256,
 		'intermediate_size': 11008,
@@ -61,6 +105,14 @@ configurations = {
 		'intermediate_size': 11008,
 		'num_hidden_layers': 4,
 		'num_attention_heads': 4,
+	},
+	'llama2c-42m': {
+		'tie_word_embeddings': True,
+		'hidden_size': 512,
+		'intermediate_size': 1376,
+		'num_hidden_layers': 8,
+		'num_attention_heads': 8,
+		'max_position_embeddings': 1024,
 	},
 	'llama-34m': {
 		'hidden_size': 256,
@@ -85,6 +137,14 @@ configurations = {
 		'intermediate_size': 11008//8,
 		'num_hidden_layers': 2,
 		'num_attention_heads': 2,
+	},
+	'llama2c-15m': {
+		'tie_word_embeddings': True,
+		'hidden_size': 288,
+		'intermediate_size': 768,
+		'num_hidden_layers': 6,
+		'num_attention_heads': 6,
+		'max_position_embeddings': 256,
 	},
 	'llama-9m': {
 		'hidden_size': 128,
