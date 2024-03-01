@@ -25,7 +25,7 @@ def load_stories(path: str):
         for line in f:
             line = line.strip()
             if line == settings.END_OF_TEXT:
-                yield '\n'.join(story)
+                if len(story): yield '\n'.join(story)
                 story = []
             else:
                 story.append(line)
